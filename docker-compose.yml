@@ -1,0 +1,29 @@
+services:
+  url-shortener: 
+    build: .
+    depends_on:
+      - db
+    networks:
+      - url-shortener-network 
+    restart: always
+    container_name: url-shortener
+    ports:
+      - 8181:8181
+  db:
+    image: postgres
+    container_name: url-shortener-db
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - pgdata2:/var/lib/postgresql/data
+    restart: always
+    networks:
+      - url-shortener-network
+
+networks:
+  url-shortener-network:
+    driver: bridge
+
+volumes:
+  pgdata2:
+    driver: local

@@ -50,7 +50,7 @@ func (h Handler) Save(w http.ResponseWriter, r *http.Request) {
       return
     } else {
       slog.Debug("link is doesn't work", "link", req.Link)
-      http.Error(w, "link id doesn't work or exists", http.StatusBadRequest)
+      http.Error(w, "link is doesn't work or exists", http.StatusBadRequest)
       return
     }
   }
