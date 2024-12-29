@@ -49,7 +49,7 @@ func (h Handler) Save(w http.ResponseWriter, r *http.Request) {
       http.Error(w, "failed to check link", http.StatusInternalServerError)
       return
     } else {
-      slog.Debug("link is doesn't work", "link", req.Link)
+      slog.Debug("link is doesn't work or exists", "link", req.Link)
       http.Error(w, "link is doesn't work or exists", http.StatusBadRequest)
       return
     }
