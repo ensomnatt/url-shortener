@@ -13,17 +13,18 @@ import (
 func main() {
   godotenv.Load(".env") 
   env := os.Getenv("ENV")
-  connStr := os.Getenv("DB_CONNECTION_STRING")
+  dbPassword := os.Getenv("DB_PASSWORD")
+  secret := []byte(os.Getenv("JWT_SECRET"))
   
   logger.Init(env)
   slog.Debug("logger is running")
 
-  db, err := database.Init(connStr)
+  db, err := database.Init(dbPassword)
   if err != nil {
     slog.Error("failed to open db", "error", err)
     panic(err)
   } 
   defer db.Close()
 
-  handlers.Start(db)
+  handlers.Start(db, secret)
 }

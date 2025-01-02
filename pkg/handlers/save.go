@@ -7,12 +7,12 @@ import (
 	"urlshortener/pkg/database"
 )
 
-type Request struct {
+type RequestSave struct {
   Alias string `json:"alias"`
   Link string `json:"link"`
 }
 
-type Response struct {
+type ResponseSave struct {
   Link string `json:"link"`
 }
 
@@ -32,7 +32,7 @@ func (h Handler) check(link string) (bool, error) {
 
 func (h Handler) Save(w http.ResponseWriter, r *http.Request) {
   //get request
-  var req Request
+  var req RequestSave
   err := json.NewDecoder(r.Body).Decode(&req)
   if err != nil {
     slog.Error("failed to get user request", "error", err)
@@ -56,7 +56,7 @@ func (h Handler) Save(w http.ResponseWriter, r *http.Request) {
   }
 
   //save link
-  err = h.db.Save(req.Alias, req.Link)
+  err = h.db.Save("urls", "alias", "link", req.Alias, req.Link)
   if err != nil {
     if err == database.AliasExists {
       slog.Debug("user's alias is already exists", "alias", req.Alias)
@@ -70,7 +70,7 @@ func (h Handler) Save(w http.ResponseWriter, r *http.Request) {
   }
 
   //send response
-  resp := Response{
+  resp := ResponseSave{
     Link: "150.241.82.204:8181/" + req.Alias,
   }
   w.Header().Set("Content-Type", "application/json")
