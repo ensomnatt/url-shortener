@@ -28,6 +28,7 @@ func Start(db *database.Storage, secret []byte) {
   r.HandleFunc("GET /{alias}", h.Get)
   r.HandleFunc("POST /register", h.Register)
   r.HandleFunc("POST /login", h.Login)
+  r.HandleFunc("POST /{alias}", h.RouteActions)
 
   slog.Info("server is up and running")
   http.ListenAndServe(":8181", r)

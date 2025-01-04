@@ -17,7 +17,7 @@ func (h Handler) Register(w http.ResponseWriter, r *http.Request) {
 
   slog.Debug("got request")
 
-  x, err := h.db.Check("users", "username", user.Username) 
+  x, err := h.db.CheckUser(user.Username) 
   if err != nil {
     slog.Error("failed to check username", "error", err, "username", user.Username)
     http.Error(w, "failed to check username", http.StatusUnauthorized)
@@ -37,7 +37,7 @@ func (h Handler) Register(w http.ResponseWriter, r *http.Request) {
     return
   }
 
-  err = h.db.Save("users", "username", "password", user.Username, hashedPassword)
+  err = h.db.SaveUser(user.Username, hashedPassword)
   if err != nil {
     slog.Error("failed to save user to the db", "error", err)
     http.Error(w, "registration was failed", http.StatusInternalServerError)

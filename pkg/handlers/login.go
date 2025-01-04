@@ -15,7 +15,7 @@ func (h Handler) Login(w http.ResponseWriter, r *http.Request) {
     return
   }
 
-  x, err := h.db.Check("users", "username", user.Username)
+  x, err := h.db.CheckUser(user.Username)
   if err != nil {
     slog.Error("failed to check username", "error", err)
     http.Error(w, "failed to check username", http.StatusUnauthorized)
@@ -27,7 +27,7 @@ func (h Handler) Login(w http.ResponseWriter, r *http.Request) {
     http.Error(w, "invalid login or password", http.StatusUnauthorized)
   }
 
-  hash, err := h.db.Get("password", "users", "username", user.Username)
+  hash, err := h.db.GetUser(user.Username)
   if err != nil {
     slog.Error("failed to get hash password from db", "error", err)
     http.Error(w, "invalid login or password", http.StatusUnauthorized)

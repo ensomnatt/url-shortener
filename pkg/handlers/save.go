@@ -5,16 +5,8 @@ import (
 	"log/slog"
 	"net/http"
 	"urlshortener/pkg/database"
+	"urlshortener/pkg/models"
 )
-
-type RequestSave struct {
-  Alias string `json:"alias"`
-  Link string `json:"link"`
-}
-
-type ResponseSave struct {
-  Link string `json:"link"`
-}
 
 func (h Handler) check(link string) (bool, error) {
   resp, err := http.Get(link)
@@ -32,13 +24,22 @@ func (h Handler) check(link string) (bool, error) {
 
 func (h Handler) Save(w http.ResponseWriter, r *http.Request) {
   //get request
-  var req RequestSave
-  err := json.NewDecoder(r.Body).Decode(&req)
+  username, err := h.tokener.ValidateToken(r)
+  if err != nil {
+    slog.Debug("invalid token")
+    http.Error(w, "invalid token", http.StatusUnauthorized)
+    return
+  }
+
+  var req models.RequestSave
+
+  err = json.NewDecoder(r.Body).Decode(&req)
   if err != nil {
     slog.Error("failed to get user request", "error", err)
     http.Error(w, "failed to get your request", http.StatusInternalServerError)
     return
   }
+
   slog.Debug("get request from user", "alias", req.Alias, "link", req.Link)
 
   //check link
@@ -56,7 +57,7 @@ func (h Handler) Save(w http.ResponseWriter, r *http.Request) {
   }
 
   //save link
-  err = h.db.Save("urls", "alias", "link", req.Alias, req.Link)
+  err = h.db.Save(req.Alias, req.Link, username)
   if err != nil {
     if err == database.AliasExists {
       slog.Debug("user's alias is already exists", "alias", req.Alias)
@@ -70,7 +71,7 @@ func (h Handler) Save(w http.ResponseWriter, r *http.Request) {
   }
 
   //send response
-  resp := ResponseSave{
+  resp := models.ResponseSave{
     Link: "150.241.82.204:8181/" + req.Alias,
   }
   w.Header().Set("Content-Type", "application/json")
