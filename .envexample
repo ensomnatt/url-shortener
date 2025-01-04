@@ -1,0 +1,8 @@
+#can be local, dev or prod
+ENV=local 
+
+#password for postgresql
+DB_PASSWORD=12321
+
+#secret key for jwt tokens
+JWT_SECRET=zalupa
